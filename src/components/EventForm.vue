@@ -1,13 +1,13 @@
 <template>
   <q-card>
     <q-card-section>
-      <div class="text-h6">{{ isEdit ? "Edit Event" : "Add Event" }}</div>
+      <div class="text-h6">Add Event</div>
     </q-card-section>
 
     <q-card-section>
-      <q-input v-model="localEvent.title" label="Event Title" outlined dense />
+      <q-input v-model="title" label="Event Title" outlined dense />
       <q-input
-        v-model="localEvent.date"
+        v-model="date"
         type="date"
         label="Event Date"
         outlined
@@ -18,7 +18,7 @@
 
     <q-card-actions align="right">
       <q-btn
-        :label="isEdit ? 'Update' : 'Add'"
+        label="Add"
         color="primary"
         @click="submitEvent"
       />
@@ -31,33 +31,16 @@ import { mapActions } from "vuex";
 
 export default {
   name: "EventForm",
-  props:['eventToEdit'],
   data() {
     return {
-      localEvent: {
-        title: "",
-        date: ""
-      }
+      title: "",
+      date: ""
     };
   },
-  computed: {
-    isEdit() {
-      return !!this.eventToEdit;
-    }
-  },
-  watch: {
-    eventToEdit: {
-      immediate: true,
-      handler(newVal) {
-        this.localEvent = newVal ? { ...newVal } : { title: "", date: "" };
-      }
-    }
-  },
   methods: {
-    ...mapActions(["addEvent", "updateEvent"]),
+    ...mapActions(["addEvent"]),
     submitEvent() {
-      const { title, date } = this.localEvent;
-      if (!title || !date) {
+      if (!this.title || !this.date) {
         this.$q.notify({
           message: "Please fill all fields!",
           color: "negative",
@@ -66,24 +49,19 @@ export default {
         return;
       }
 
-      if (this.isEdit) {
-        this.updateEvent(this.localEvent);
-        this.$q.notify({
-          message: "Event updated successfully!",
-          color: "green",
-          position: "top-right"
-        });
-      } else {
-        this.addEvent({ title, date });
-        this.$q.notify({
-          message: `Event "${title}" added on ${date}!`,
-          color: "green",
-          position: "top-right"
-        });
-        this.localEvent = { title: "", date: "" }; 
-      }
+      this.addEvent({ title: this.title, date: this.date });
 
-      this.$emit("done"); 
+      this.$q.notify({
+        message: `Event "${this.title}" added on ${this.date}!`,
+        color: "green",
+        position: "top-right"
+      });
+
+      // Reset form after adding
+      this.title = "";
+      this.date = "";
+
+      this.$emit("done");
     }
   }
 };
