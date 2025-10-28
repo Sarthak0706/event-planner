@@ -27,6 +27,7 @@
 </template>
 
 <script>
+/*global cordova*/
 import { mapActions } from "vuex";
 
 export default {
@@ -51,13 +52,18 @@ export default {
 
       this.addEvent({ title: this.title, date: this.date });
 
-      this.$q.notify({
-        message: `Event "${this.title}" added on ${this.date}!`,
-        color: "green",
-        position: "top-right"
-      });
-
-      // Reset form after adding
+     if (window.cordova && cordova.plugins && cordova.plugins.notification) {
+      cordova.plugins.notification.local.schedule({
+      title: 'New Event Created',
+      text: `Meeting: ${this.title} on ${this.date}`,
+      foreground: true, // show even if app is open
+      smallIcon: 'res://ic_stat_notify', // optional, ensure icon exists
+      led: 'FF0000', // red LED light
+      sound: true
+    });
+    } else {
+      console.warn('Cordova not ready — running in browser mode');
+    }
       this.title = "";
       this.date = "";
 

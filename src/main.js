@@ -1,13 +1,13 @@
-import { createApp } from "vue";
-import App from "./App.vue";
-import store from "./store";
+/*global cordova*/
+import { createApp } from 'vue'
+import App from './App.vue'
 
-import { Quasar, Notify } from "quasar";
-import "quasar/dist/quasar.css";
+const app = createApp(App)
 
-const app = createApp(App);
+document.addEventListener('deviceready', () => {
+  cordova.plugins.notification.local.requestPermission((granted) => {
+    console.log('Notification permission granted?', granted)
+  })
+})
 
-app.use(store);
-app.use(Quasar, { plugins: { Notify } });
-
-app.mount("#app");
+app.mount('#app')
